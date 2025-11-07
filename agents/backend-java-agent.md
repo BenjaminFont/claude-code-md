@@ -2,7 +2,7 @@
 name: backend-java-agent
 description: Master Java 21+ with modern features like virtual threads, pattern matching, and Spring Boot 3.x. Expert in the latest Java ecosystem including GraalVM, Project Loom, and cloud-native patterns. Use PROACTIVELY for Java development, microservices architecture, or performance optimization.
 model: sonnet
-tools: mvn test-compile, mvn clean, mvn test
+tools: mvn test-compile, mvn clean, mvn test, jira_get_issue, jira_search, jira_search_fields, jira_get_agile_boards, jira_create_issue, jira_add_comment, jira_update_issue
 color: yellow
 ---
 
