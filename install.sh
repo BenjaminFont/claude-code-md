@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Install script for claude-code-md
-# Downloads and installs agents and commands from GitHub to a project's .claude/ folder
+# Downloads and installs agents, skills, commands, and docs from GitHub to a project's .claude/ folder
 
 set -e
 
@@ -12,26 +12,46 @@ BRANCH="main"
 
 INSTALL_AGENTS=true
 INSTALL_COMMANDS=true
+INSTALL_SKILLS=true
+INSTALL_DOCS=true
 
 # Parse flags
 while [[ $# -gt 0 ]]; do
   case $1 in
     --agents-only)
       INSTALL_COMMANDS=false
+      INSTALL_SKILLS=false
+      INSTALL_DOCS=false
       shift
       ;;
     --commands-only)
       INSTALL_AGENTS=false
+      INSTALL_SKILLS=false
+      INSTALL_DOCS=false
+      shift
+      ;;
+    --skills-only)
+      INSTALL_AGENTS=false
+      INSTALL_COMMANDS=false
+      INSTALL_DOCS=false
+      shift
+      ;;
+    --docs-only)
+      INSTALL_AGENTS=false
+      INSTALL_COMMANDS=false
+      INSTALL_SKILLS=false
       shift
       ;;
     -h|--help)
       echo "Usage: install.sh [OPTIONS] <target-dir>"
       echo ""
-      echo "Install claude-code-md agents and commands from GitHub to a project."
+      echo "Install claude-code-md agents, skills, commands, and docs from GitHub to a project."
       echo ""
       echo "Options:"
       echo "  --agents-only    Only install agents"
+      echo "  --skills-only    Only install skills"
       echo "  --commands-only  Only install commands"
+      echo "  --docs-only      Only install docs"
       echo "  -h, --help       Show this help message"
       echo ""
       echo "Examples:"
@@ -40,6 +60,9 @@ while [[ $# -gt 0 ]]; do
       echo ""
       echo "  # Only agents"
       echo "  curl -fsSL https://raw.githubusercontent.com/$REPO_OWNER/$REPO_NAME/$BRANCH/install.sh | bash -s -- --agents-only /path/to/project"
+      echo ""
+      echo "  # Only skills"
+      echo "  curl -fsSL https://raw.githubusercontent.com/$REPO_OWNER/$REPO_NAME/$BRANCH/install.sh | bash -s -- --skills-only /path/to/project"
       echo ""
       echo "  # Only commands"
       echo "  curl -fsSL https://raw.githubusercontent.com/$REPO_OWNER/$REPO_NAME/$BRANCH/install.sh | bash -s -- --commands-only /path/to/project"
@@ -100,6 +123,20 @@ if [ "$INSTALL_AGENTS" = true ]; then
   fi
 fi
 
+# Install skills
+if [ "$INSTALL_SKILLS" = true ]; then
+  if [ -d "$EXTRACT_DIR/skills" ]; then
+    echo "Installing skills..."
+    cp -r "$EXTRACT_DIR/skills" "$TARGET_DIR/.claude/"
+    for dir in "$EXTRACT_DIR/skills"/*/; do
+      [ -d "$dir" ] && echo "  - $(basename "$dir")/SKILL.md"
+    done
+    echo "Installed skills"
+  else
+    echo "Warning: No skills directory found in repository"
+  fi
+fi
+
 # Install commands
 if [ "$INSTALL_COMMANDS" = true ]; then
   if [ -d "$EXTRACT_DIR/commands" ]; then
@@ -118,6 +155,20 @@ if [ "$INSTALL_COMMANDS" = true ]; then
     echo "Installed commands"
   else
     echo "Warning: No commands directory found in repository"
+  fi
+fi
+
+# Install docs
+if [ "$INSTALL_DOCS" = true ]; then
+  if [ -d "$EXTRACT_DIR/docs" ]; then
+    echo "Installing docs..."
+    cp -r "$EXTRACT_DIR/docs" "$TARGET_DIR/.claude/"
+    for file in "$EXTRACT_DIR/docs"/*.md; do
+      [ -f "$file" ] && echo "  - $(basename "$file")"
+    done
+    echo "Installed docs"
+  else
+    echo "Warning: No docs directory found in repository"
   fi
 fi
 
